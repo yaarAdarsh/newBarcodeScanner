@@ -148,7 +148,6 @@ export default function Home() {
             maxWidth: 500,
             marginTop: 20,
             border: "1px solid #ccc",
-            aspectRatio: "16 / 9",
           }}
           autoPlay
           muted
