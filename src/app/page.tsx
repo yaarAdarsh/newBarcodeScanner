@@ -72,6 +72,8 @@ export default function Home() {
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const controlsRef = useRef<IScannerControls | null>(null);
 
+  const hasScannedRef = useRef(false);
+
   const [result, setResult] = useState("");
   const [scanning, setScanning] = useState(false);
 
@@ -88,6 +90,7 @@ export default function Home() {
 
     setScanning(true);
     setResult("");
+    hasScannedRef.current = false;
 
     // wait for <video> to be mounted
     setTimeout(async () => {
@@ -96,20 +99,22 @@ export default function Home() {
       try {
         const devices = await BrowserMultiFormatReader.listVideoInputDevices();
         const backCamera =
-          devices.find(
-            (d) =>
-              d.label.toLowerCase().includes("back") ||
-              d.label.toLowerCase().includes("rear"),
-          ) || devices[0];
+          devices.find((d) => /back|rear|environment/i.test(d.label)) ||
+          devices[0];
+
+        readerRef.current = new BrowserMultiFormatReader();
 
         controlsRef.current = await readerRef.current!.decodeFromVideoDevice(
           backCamera.deviceId,
           videoRef.current,
           (result) => {
-            if (result) {
-              setResult(result.getText());
-              stopScanning();
-            }
+            if (!result || hasScannedRef.current) return;
+
+            hasScannedRef.current = true;
+            const decodedText = result.getText();
+
+            setResult(decodedText);
+            stopScanning();
           },
         );
       } catch (err) {
