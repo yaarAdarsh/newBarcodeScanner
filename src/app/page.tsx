@@ -97,22 +97,21 @@ export default function Home() {
         const devices = await BrowserMultiFormatReader.listVideoInputDevices();
         const backCamera =
           devices.find(
-            d =>
+            (d) =>
               d.label.toLowerCase().includes("back") ||
-              d.label.toLowerCase().includes("rear")
+              d.label.toLowerCase().includes("rear"),
           ) || devices[0];
 
-        controlsRef.current =
-          await readerRef.current!.decodeFromVideoDevice(
-            backCamera.deviceId,
-            videoRef.current,
-            (result) => {
-              if (result) {
-                setResult(result.getText());
-                stopScanning();
-              }
+        controlsRef.current = await readerRef.current!.decodeFromVideoDevice(
+          backCamera.deviceId,
+          videoRef.current,
+          (result) => {
+            if (result) {
+              setResult(result.getText());
+              stopScanning();
             }
-          );
+          },
+        );
       } catch (err) {
         console.error("Camera error:", err);
         setScanning(false);
@@ -141,17 +140,18 @@ export default function Home() {
       )}
 
       {scanning && (
-        <video
-          ref={videoRef}
-          style={{
-            width: "100%",
-            maxWidth: 500,
-            marginTop: 20,
-            border: "1px solid #ccc",
-          }}
-          autoPlay
-          muted
-        />
+        <div className="relative w-full h-[140px] overflow-hidden rounded border bg-black">
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            playsInline
+          />
+
+          {/* Scan guide line */}
+          <div className="absolute inset-x-0 top-1/2 h-[2px] bg-red-500 animate-pulse" />
+        </div>
       )}
 
       <p>Result: {result}</p>
