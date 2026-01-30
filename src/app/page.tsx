@@ -102,14 +102,23 @@ export default function Home() {
         const devices = await BrowserMultiFormatReader.listVideoInputDevices();
         const backCamera =
           devices.find((d) => /back|rear|environment/i.test(d.label)) || devices[0];
+        //         controlsRef.current = await readerRef.current!.decodeFromVideoDevice(
+//           backCamera.deviceId,
+//           videoRef.current,
+//           (result) => {
+//             if (!result || hasScannedRef.current) return;
 
+//             hasScannedRef.current = true;
+//             const decodedText = result.getText();
+
+//             setResult(decodedText);
+//             stopScanning();
+//           },
+//         );
         controlsRef.current = await readerRef.current!.decodeFromConstraints(
           {
             video: {
-              deviceId: backCamera.deviceId,
-              width: { ideal: 640 },
-              height: { ideal: 240 },
-              facingMode: "environment",
+              deviceId: backCamera.deviceId
             }
           },
           videoRef.current,
